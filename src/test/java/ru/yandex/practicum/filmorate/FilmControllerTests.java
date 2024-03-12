@@ -62,6 +62,7 @@ public class FilmControllerTests {
                 .version(HttpClient.Version.HTTP_1_1)
                 .build();
     }
+
     @Test
     void shouldReturnEmptyFilmListTest() throws IOException, InterruptedException {
         HttpResponse<String> response = httpClient.send(requestGETFilms(), responseHandler);
