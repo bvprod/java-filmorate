@@ -7,39 +7,34 @@ import ru.yandex.practicum.filmorate.model.Film;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
 
-    private final HashSet<Film> films = new HashSet<>();
+    private final HashMap<Integer, Film> films = new HashMap<>();
 
     private int idCounter = 1;
 
+    private static final LocalDate earliestFilm = LocalDate.of(1895, 12, 28);
+
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895,12,28))) {
-            log.warn("Дата создания фильма ожидалась от 1895-12-28, получено: " + film.getReleaseDate());
-            throw new ValidationException("Некорректная дата создания фильма");
-        } else {
-            film.setId(idCounter++);
-            films.add(film);
-            log.info("Фильм " + film.getId() + " добавлен. Всего фильмов в коллекции: " + films.size());
-            return film;
-        }
+        checkFilmReleaseDate(film.getReleaseDate());
+        film.setId(idCounter++);
+        films.put(film.getId(), film);
+        log.info("Фильм " + film.getId() + " добавлен. Всего фильмов в коллекции: " + films.size());
+        return film;
+
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895,12,28))) {
-            log.warn("Дата создания фильма ожидалась от 1895-12-28, получено: " + film.getReleaseDate());
-            throw new ValidationException("Некорректная дата создания фильма");
-        } else if (films.contains(film)) {
-            films.remove(film);
-            films.add(film);
+        checkFilmReleaseDate(film.getReleaseDate());
+        if (films.containsKey(film.getId())) {
+            films.put(film.getId(), film);
             log.info("Фильм " + film.getId() + " обновлен");
             return film;
         } else {
@@ -49,7 +44,14 @@ public class FilmController {
     }
 
     @GetMapping
-    public Set<Film> getFilms() {
-        return films;
+    public List<Film> getFilms() {
+        return new ArrayList<>(films.values());
+    }
+
+    private void checkFilmReleaseDate(LocalDate date) {
+        if (date.isBefore(earliestFilm)) {
+            log.warn("Дата создания фильма ожидалась от 1895-12-28, получено: " + date);
+            throw new ValidationException("Некорректная дата создания фильма");
+        }
     }
 }

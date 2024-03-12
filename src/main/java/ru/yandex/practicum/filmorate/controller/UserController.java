@@ -6,15 +6,14 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
 
-    private final HashSet<User> users = new HashSet<>();
+    private final HashMap<Integer,User> users = new HashMap<>();
     private int idCounter = 1;
 
     @PostMapping
@@ -23,16 +22,15 @@ public class UserController {
             user.setName(user.getLogin());
         }
         user.setId(idCounter++);
-        users.add(user);
+        users.put(user.getId(),user);
         log.info("Пользователь " + user.getId() + " добавлен");
         return user;
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        if (users.contains(user)) {
-            users.remove(user);
-            users.add(user);
+        if (users.containsKey(user.getId())) {
+            users.put(user.getId(), user);
             log.info("Информация о пользователе " + user.getId() + " обновлена");
             return user;
         } else {
@@ -42,7 +40,7 @@ public class UserController {
     }
 
     @GetMapping
-    public Set<User> getUsers() {
-        return users;
+    public List<User> getUsers() {
+        return new ArrayList<>(users.values());
     }
 }

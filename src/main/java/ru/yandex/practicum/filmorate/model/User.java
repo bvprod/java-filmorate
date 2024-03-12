@@ -14,7 +14,8 @@ import java.time.LocalDate;
 public class User {
     @EqualsAndHashCode.Include
     private int id;
-    @Email(message = "Поле email должно содержать корректный адрес электронной почтыа")
+    @Email(message = "Поле email должно содержать корректный адрес электронной почты")
+    @NotBlank(message = "Поле email должно быть заполнено")
     private String email;
     @NotBlank(message = "Логин не должен быть пустым")
     @Pattern(regexp = "^\\S+$", message = "Логин не должен содержать пробелы")
