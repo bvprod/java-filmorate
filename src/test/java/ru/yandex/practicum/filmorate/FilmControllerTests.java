@@ -206,5 +206,4 @@ public class FilmControllerTests {
         HttpResponse<String> response = httpClient.send(requestPOSTFilms(jsonSent), responseHandler);
         assertEquals(400, response.statusCode());
     }
-
 }
