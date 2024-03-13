@@ -13,12 +13,12 @@ import java.util.*;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
+    private static final LocalDate earliestFilm = LocalDate.of(1895, 12, 28);
 
-    private final HashMap<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, Film> films = new HashMap<>();
 
     private int idCounter = 1;
 
-    private static final LocalDate earliestFilm = LocalDate.of(1895, 12, 28);
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
@@ -37,10 +37,10 @@ public class FilmController {
             films.put(film.getId(), film);
             log.info("Фильм " + film.getId() + " обновлен");
             return film;
-        } else {
-            log.warn("Фильм с id " + film.getId() + " не найден");
-            throw new ValidationException("Фильм с id " + film.getId() + " не найден");
         }
+        log.info("Фильм с id " + film.getId() + " не найден");
+        log.warn("Фильм с id " + film.getId() + " не найден");
+        throw new ValidationException("Фильм с id " + film.getId() + " не найден");
     }
 
     @GetMapping

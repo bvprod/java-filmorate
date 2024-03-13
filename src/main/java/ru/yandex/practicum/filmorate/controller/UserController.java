@@ -13,7 +13,7 @@ import java.util.*;
 @Slf4j
 public class UserController {
 
-    private final HashMap<Integer,User> users = new HashMap<>();
+    private final Map<Integer, User> users = new HashMap<>();
     private int idCounter = 1;
 
     @PostMapping
@@ -22,7 +22,7 @@ public class UserController {
             user.setName(user.getLogin());
         }
         user.setId(idCounter++);
-        users.put(user.getId(),user);
+        users.put(user.getId(), user);
         log.info("Пользователь " + user.getId() + " добавлен");
         return user;
     }
@@ -33,10 +33,9 @@ public class UserController {
             users.put(user.getId(), user);
             log.info("Информация о пользователе " + user.getId() + " обновлена");
             return user;
-        } else {
-            log.warn("Пользователь с id " + user.getId() + " не найден");
-            throw new ValidationException("Пользователь с id " + user.getId() + " не найден");
         }
+        log.warn("Пользователь с id " + user.getId() + " не найден");
+        throw new UserNotFoundException("Пользователь с id " + user.getId() + " не найден");
     }
 
     @GetMapping
