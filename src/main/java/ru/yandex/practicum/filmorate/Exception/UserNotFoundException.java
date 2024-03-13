@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.Exception;
 
 public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException() {
