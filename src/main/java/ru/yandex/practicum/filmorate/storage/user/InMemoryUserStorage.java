@@ -34,17 +34,25 @@ public class InMemoryUserStorage implements UserStorage {
             log.info("Информация о пользователе " + user.getId() + " обновлена");
             return user;
         }
+        log.info("Пользователь с id " + user.getId() + " не найден");
         log.warn("Пользователь с id " + user.getId() + " не найден");
         throw new UserNotFoundException("Пользователь с id " + user.getId() + " не найден");
     }
 
     @Override
     public List<User> getUsers() {
+        log.warn("Запрошен список всех пользователей");
         return new ArrayList<>(users.values());
     }
 
     @Override
     public User getUser(int userId) {
+        log.warn("Запрошен пользователь с id " + userId);
+        if (!users.containsKey(userId)) {
+            log.info("Пользователь с id " + userId + " не найден");
+            log.warn("Пользователь с id " + userId + " не найден");
+            throw new UserNotFoundException("Пользователь с id " + userId + " не найден");
+        }
         return users.get(userId);
     }
 

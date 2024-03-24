@@ -22,13 +22,13 @@ public class Film {
     private LocalDate releaseDate;
     @Positive(message = "Длительность фильма должна быть положительным числом")
     private int duration;
-    private Set<User> likes;
+    private Set<Integer> likes;
 
-    public boolean addLike(User user) {
-        return likes.add(user);
+    public void addLike(int userId) {
+        likes.add(userId);
     }
 
-    public boolean removeLike(User user) {
-        return likes.remove(user);
+    public void removeLike(int userId) {
+        likes.remove(userId);
     }
 }

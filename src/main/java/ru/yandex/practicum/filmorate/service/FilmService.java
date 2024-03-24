@@ -21,12 +21,16 @@ public class FilmService {
         this.filmStorage = filmStorage;
     }
 
-    public boolean addLike(Film film, User user) {
-        return film.addLike(user);
+    public Film addLike(int filmId, int userId) {
+       Film film = getFilm(filmId);
+       film.addLike(userId);
+       return film;
     }
 
-    public boolean removeLike(Film film, User user) {
-        return film.removeLike(user);
+    public Film removeLike(int filmId, int userId) {
+        Film film = getFilm(filmId);
+        film.removeLike(userId);
+        return film;
     }
 
     public List<Film> getPopularFilms(int count, String sortingOrder) {
@@ -34,6 +38,10 @@ public class FilmService {
                 .sorted((f1, f2) -> compareFilmsByPopularity(f1, f2, sortingOrder))
                 .limit(count)
                 .collect(Collectors.toList());
+    }
+
+    public Film getFilm(int filmId) {
+        return filmStorage.getFilm(filmId);
     }
 
     private int compareFilmsByPopularity(Film film1, Film film2, String sort) {

@@ -26,11 +26,11 @@ public class User {
     private LocalDate birthday;
     private Set<User> friends;
 
-    public boolean addFriend(User user) {
-        return friends.add(user);
+    public void addFriend(User user) {
+        friends.add(user);
     }
 
-    public boolean removeFriend(User user) {
-        return friends.remove(user);
+    public void removeFriend(User user) {
+        friends.remove(user);
     }
 }

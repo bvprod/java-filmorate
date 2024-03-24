@@ -45,11 +45,18 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getFilms() {
+        log.info("Запрошен список всех фильмов");
         return new ArrayList<>(films.values());
     }
 
     @Override
     public Film getFilm(int filmId) {
+        log.info("Запрошен фильм с id " + filmId);
+        if (!films.containsKey(filmId)) {
+            log.info("Фильм с id " + filmId + " не найден");
+            log.warn("Фильм с id " + filmId + " не найден");
+            throw new ValidationException("Фильм с id " + filmId + " не найден");
+        }
         return films.get(filmId);
     }
 

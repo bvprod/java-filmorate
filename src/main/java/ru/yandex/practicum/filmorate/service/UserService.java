@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -18,19 +19,33 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public boolean addFriend(User user1, User user2) {
-        return user1.addFriend(user2) && user2.addFriend(user1);
+    public User addFriend(int userId, int friendId) {
+        User user = getUser(userId);
+        User friend = getUser(friendId);
+        user.addFriend(friend);
+        friend.addFriend(user);
+        return user;
     }
 
-    public boolean removeFriend(User user1, User user2) {
-        return user1.removeFriend(user2) && user2.removeFriend(user1);
+    public User removeFriend(int userId, int friendId) {
+        User user = getUser(userId);
+        User friend = getUser(friendId);
+        user.removeFriend(friend);
+        friend.removeFriend(user);
+        return user;
     }
 
-    public Set<User> getUserFriends(User user) {
-        return user.getFriends();
+    public Set<User> getUserFriends(int userId) {
+        return getUser(userId).getFriends();
     }
 
-    public List<User> getMutualFriends(User user1, User user2) {
-        return user1.getFriends().stream().filter(user2.getFriends()::contains).collect(Collectors.toList());
+    public User getUser(int userId) {
+        return userStorage.getUser(userId);
+    }
+
+    public List<User> getCommonFriends(int user1, int user2) {
+        return getUser(user1).getFriends().stream()
+                .filter(getUser(user2).getFriends()::contains)
+                .collect(Collectors.toList());
     }
 }

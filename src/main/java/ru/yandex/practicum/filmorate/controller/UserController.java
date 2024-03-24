@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -38,5 +39,30 @@ public class UserController {
     @GetMapping
     public List<User> getUsers() {
         return userStorage.getUsers();
+    }
+
+    @GetMapping("/{userId}")
+    public User getUserById(@PathVariable("userId") int userId) {
+        return userStorage.getUser(userId);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public User addFriend(@PathVariable("id") int userId, @PathVariable("friendId") int friendId) {
+        return userService.addFriend(userId, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public User removeFriend(@PathVariable("id") int userId, @PathVariable("friendId") int friendId) {
+        return userService.removeFriend(userId, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public Set<User> getUserFriends(@PathVariable("id") int userId) {
+        return userService.getUserFriends(userId);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable("id") int userId, @PathVariable("otherId") int otherUserId) {
+        return userService.getCommonFriends(userId, otherUserId);
     }
 }
