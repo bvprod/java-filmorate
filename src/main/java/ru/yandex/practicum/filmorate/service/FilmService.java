@@ -4,13 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.yandex.practicum.filmorate.storage.Constants.ASCENDING_ORDER;
 import static ru.yandex.practicum.filmorate.storage.Constants.DESCENDING_ORDER;
 
 @Service
@@ -27,19 +25,19 @@ public class FilmService {
     public Film addLike(int filmId, int userId) {
         Film film = getFilm(filmId);
         film.addLike(userId);
-//        log.info("Поставлен лайк фильму " + filmId + " от пользователя " + userId);
+        log.info("Поставлен лайк фильму " + filmId + " от пользователя " + userId);
         return film;
     }
 
     public Film removeLike(int filmId, int userId) {
         Film film = getFilm(filmId);
         film.removeLike(userId);
-//        log.info("Удален лайк по фильму " + filmId + " от пользователя " + userId);
+        log.info("Удален лайк по фильму " + filmId + " от пользователя " + userId);
         return film;
     }
 
     public List<Film> getPopularFilms(int count, String sortingOrder) {
-//        log.info("Запрошен список " + count + " популярных фильмов. Сортировка " + sortingOrder);
+        log.info("Запрошен список " + count + " популярных фильмов. Сортировка " + sortingOrder);
         return filmStorage.getFilms().stream()
                 .sorted((f1, f2) -> compareFilmsByPopularity(f1, f2, sortingOrder))
                 .limit(count)
@@ -47,7 +45,7 @@ public class FilmService {
     }
 
     public Film getFilm(int filmId) {
-//        log.info("Запрошен фильм " + filmId);
+        log.info("Запрошен фильм " + filmId);
         return filmStorage.getFilm(filmId);
     }
 

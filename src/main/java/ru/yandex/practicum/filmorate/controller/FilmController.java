@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.IncorrectParameterException;
@@ -9,9 +8,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
-import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
 
 import static ru.yandex.practicum.filmorate.storage.Constants.DESCENDING_ORDER;
 import static ru.yandex.practicum.filmorate.storage.Constants.SORTS;
@@ -60,7 +57,7 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<Film> getPopularFilms(
-            @RequestParam(defaultValue = "10" ,required = false) Integer size,
+            @RequestParam(defaultValue = "10", required = false) Integer size,
             @RequestParam(defaultValue = DESCENDING_ORDER, required = false) String sortingOrder
     ) {
         if (!SORTS.contains(sortingOrder)) {
