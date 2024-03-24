@@ -44,23 +44,23 @@ public class FilmController {
     }
 
     @GetMapping("/{filmId}")
-    public Film getFilmById(@PathVariable("filmId") int filmId) {
+    public Film getFilmById(@PathVariable("filmId") Integer filmId) {
         return filmStorage.getFilm(filmId);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public Film addFilmLike(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
+    public Film addFilmLike(@PathVariable("id") Integer filmId, @PathVariable("userId") Integer userId) {
         return filmService.addLike(filmId, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public Film removeFilmLike(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
+    public Film removeFilmLike(@PathVariable("id") Integer filmId, @PathVariable("userId") Integer userId) {
         return filmService.removeLike(filmId, userId);
     }
 
     @GetMapping("/popular")
     public List<Film> getPopularFilms(
-            @RequestParam(defaultValue = "10" ,required = false) int size,
+            @RequestParam(defaultValue = "10" ,required = false) Integer size,
             @RequestParam(defaultValue = DESCENDING_ORDER, required = false) String sortingOrder
     ) {
         if (!SORTS.contains(sortingOrder)) {

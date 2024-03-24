@@ -14,7 +14,6 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/users")
-@Slf4j
 public class UserController {
 
     private final UserStorage userStorage;
@@ -47,22 +46,22 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable("id") int userId, @PathVariable("friendId") int friendId) {
+    public User addFriend(@PathVariable("id") Integer userId, @PathVariable("friendId") Integer friendId) {
         return userService.addFriend(userId, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public User removeFriend(@PathVariable("id") int userId, @PathVariable("friendId") int friendId) {
+    public User removeFriend(@PathVariable("id") Integer userId, @PathVariable("friendId") Integer friendId) {
         return userService.removeFriend(userId, friendId);
     }
 
     @GetMapping("/{id}/friends")
-    public Set<User> getUserFriends(@PathVariable("id") int userId) {
+    public List<User> getUserFriends(@PathVariable("id") Integer userId) {
         return userService.getUserFriends(userId);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getCommonFriends(@PathVariable("id") int userId, @PathVariable("otherId") int otherUserId) {
+    public List<User> getCommonFriends(@PathVariable("id") Integer userId, @PathVariable("otherId") Integer otherUserId) {
         return userService.getCommonFriends(userId, otherUserId);
     }
 }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -10,8 +11,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.storage.Constants.ASCENDING_ORDER;
+import static ru.yandex.practicum.filmorate.storage.Constants.DESCENDING_ORDER;
 
 @Service
+@Slf4j
 public class FilmService {
 
     private final FilmStorage filmStorage;
@@ -22,18 +25,21 @@ public class FilmService {
     }
 
     public Film addLike(int filmId, int userId) {
-       Film film = getFilm(filmId);
-       film.addLike(userId);
-       return film;
+        Film film = getFilm(filmId);
+        film.addLike(userId);
+//        log.info("Поставлен лайк фильму " + filmId + " от пользователя " + userId);
+        return film;
     }
 
     public Film removeLike(int filmId, int userId) {
         Film film = getFilm(filmId);
         film.removeLike(userId);
+//        log.info("Удален лайк по фильму " + filmId + " от пользователя " + userId);
         return film;
     }
 
     public List<Film> getPopularFilms(int count, String sortingOrder) {
+//        log.info("Запрошен список " + count + " популярных фильмов. Сортировка " + sortingOrder);
         return filmStorage.getFilms().stream()
                 .sorted((f1, f2) -> compareFilmsByPopularity(f1, f2, sortingOrder))
                 .limit(count)
@@ -41,13 +47,14 @@ public class FilmService {
     }
 
     public Film getFilm(int filmId) {
+//        log.info("Запрошен фильм " + filmId);
         return filmStorage.getFilm(filmId);
     }
 
     private int compareFilmsByPopularity(Film film1, Film film2, String sort) {
-        int result = film1.getLikes().size() - film2.getLikes().size(); //сортировка по убыванию
-        if (sort.equals(ASCENDING_ORDER)) {
-            result = -1 * result; //сортировка по возрастанию
+        int result = film1.getLikes().size() - film2.getLikes().size(); //сортировка по возрастанию
+        if (sort.equals(DESCENDING_ORDER)) {
+            result = -1 * result; //сортировка по убыванию
         }
         return result;
     }
