@@ -7,6 +7,7 @@ import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -21,4 +22,13 @@ public class Film {
     private LocalDate releaseDate;
     @Positive(message = "Длительность фильма должна быть положительным числом")
     private int duration;
+    private Set<User> likes;
+
+    public boolean addLike(User user) {
+        return likes.add(user);
+    }
+
+    public boolean removeLike(User user) {
+        return likes.remove(user);
+    }
 }

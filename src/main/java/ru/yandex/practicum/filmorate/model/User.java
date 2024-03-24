@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -23,4 +24,13 @@ public class User {
     private String name;
     @PastOrPresent(message = "День рождения должен быть датой в прошлом")
     private LocalDate birthday;
+    private Set<User> friends;
+
+    public boolean addFriend(User user) {
+        return friends.add(user);
+    }
+
+    public boolean removeFriend(User user) {
+        return friends.remove(user);
+    }
 }
