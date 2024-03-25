@@ -165,7 +165,7 @@ public class UserControllerTests {
                 "  \"birthday\": \"1946-08-20\"\n" +
                 "}";
         HttpResponse<String> response = httpClient.send(requestPOSTUsers(jsonSent), responseHandler);
-        assertEquals(500, response.statusCode());
+        assertEquals(400, response.statusCode());
     }
 
     @Test
@@ -176,7 +176,7 @@ public class UserControllerTests {
                 "  \"birthday\": \"1946-08-20\"\n" +
                 "}";
         HttpResponse<String> response = httpClient.send(requestPOSTUsers(jsonSent), responseHandler);
-        assertEquals(500, response.statusCode());
+        assertEquals(400, response.statusCode());
     }
 
     @Test
@@ -207,7 +207,7 @@ public class UserControllerTests {
                 "  \"birthday\": \"2946-08-20\"\n" +
                 "}";
         HttpResponse<String> response = httpClient.send(requestPOSTUsers(jsonSent), responseHandler);
-        assertEquals(500, response.statusCode());
+        assertEquals(400, response.statusCode());
     }
 
     @Test
@@ -218,7 +218,7 @@ public class UserControllerTests {
                 "  \"birthday\": \"1946-08-20\"\n" +
                 "}";
         HttpResponse<String> response = httpClient.send(requestPOSTUsers(jsonSent), responseHandler);
-        assertEquals(500, response.statusCode());
+        assertEquals(400, response.statusCode());
     }
 
     @Test
@@ -229,6 +229,6 @@ public class UserControllerTests {
                 "  \"birthday\": \"1946-08-20\"\n" +
                 "}";
         HttpResponse<String> response = httpClient.send(requestPOSTUsers(jsonSent), responseHandler);
-        assertEquals(500, response.statusCode());
+        assertEquals(400, response.statusCode());
     }
 }

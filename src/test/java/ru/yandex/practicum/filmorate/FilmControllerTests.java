@@ -166,7 +166,7 @@ public class FilmControllerTests {
                 "  \"duration\": 100\n" +
                 "}";
         HttpResponse<String> response = httpClient.send(requestPOSTFilms(jsonSent), responseHandler);
-        assertEquals(500, response.statusCode());
+        assertEquals(400, response.statusCode());
     }
 
     @Test
@@ -183,7 +183,7 @@ public class FilmControllerTests {
                 "  \"duration\": 300\n" +
                 "}";
         HttpResponse<String> response = httpClient.send(requestPOSTFilms(jsonSent), responseHandler);
-        assertEquals(500, response.statusCode());
+        assertEquals(400, response.statusCode());
     }
 
     @Test
@@ -207,6 +207,6 @@ public class FilmControllerTests {
                 "  \"duration\": -100\n" +
                 "}";
         HttpResponse<String> response = httpClient.send(requestPOSTFilms(jsonSent), responseHandler);
-        assertEquals(500, response.statusCode());
+        assertEquals(400, response.statusCode());
     }
 }
