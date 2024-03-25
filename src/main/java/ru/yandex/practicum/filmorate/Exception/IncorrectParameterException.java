@@ -1,5 +1,8 @@
 package ru.yandex.practicum.filmorate.Exception;
 
+import lombok.Getter;
+
+@Getter
 public class IncorrectParameterException extends RuntimeException {
     private final String parameter;
 
@@ -7,7 +10,4 @@ public class IncorrectParameterException extends RuntimeException {
         this.parameter = parameter;
     }
 
-    public String getParameter() {
-        return parameter;
-    }
 }
