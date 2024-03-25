@@ -16,14 +16,17 @@ import static ru.yandex.practicum.filmorate.storage.Constants.DESCENDING_ORDER;
 public class FilmService {
 
     private final FilmStorage filmStorage;
+    private final UserService userService;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage) {
+    public FilmService(FilmStorage filmStorage, UserService userService) {
         this.filmStorage = filmStorage;
+        this.userService = userService;
     }
 
     public Film addLike(int filmId, int userId) {
         Film film = getFilm(filmId);
+        userService.getUser(userId); //throws error if user not found
         film.addLike(userId);
         log.info("Поставлен лайк фильму " + filmId + " от пользователя " + userId);
         return film;
@@ -31,6 +34,7 @@ public class FilmService {
 
     public Film removeLike(int filmId, int userId) {
         Film film = getFilm(filmId);
+        userService.getUser(userId); //throws error if user not found
         film.removeLike(userId);
         log.info("Удален лайк по фильму " + filmId + " от пользователя " + userId);
         return film;
