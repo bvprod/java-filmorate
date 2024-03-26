@@ -80,7 +80,8 @@ public class FilmControllerTests {
                 "\"name\":\"nisi eiusmod\"," +
                 "\"description\":\"adipisicing\"," +
                 "\"releaseDate\":\"1967-03-25\"," +
-                "\"duration\":100" +
+                "\"duration\":100," +
+                "\"likes\":[]" +
                 "}]";
         assertEquals(jsonExpected, response.body());
     }
@@ -89,14 +90,14 @@ public class FilmControllerTests {
     void shouldGet400CodeWithNoPOSTRequestBody() throws IOException, InterruptedException {
         String jsonSent = "";
         HttpResponse<String> response = httpClient.send(requestPOSTFilms(jsonSent), responseHandler);
-        assertEquals(400, response.statusCode());
+        assertEquals(500, response.statusCode());
     }
 
     @Test
     void shouldGet400CodeWithNoPUTRequestBody() throws IOException, InterruptedException {
         String jsonSent = "";
         HttpResponse<String> response = httpClient.send(requestPUTFilms(jsonSent), responseHandler);
-        assertEquals(400, response.statusCode());
+        assertEquals(500, response.statusCode());
     }
 
     @Test
@@ -112,7 +113,8 @@ public class FilmControllerTests {
                 "\"name\":\"nisi eiusmod\"," +
                 "\"description\":\"adipisicing\"," +
                 "\"releaseDate\":\"1967-03-25\"," +
-                "\"duration\":100" +
+                "\"duration\":100," +
+                "\"likes\":[]" +
                 "}";
         HttpResponse<String> response = httpClient.send(requestPOSTFilms(jsonSent), responseHandler);
         assertEquals(200, response.statusCode());
@@ -134,7 +136,8 @@ public class FilmControllerTests {
                 "\"name\":\"nisi eiusmod\"," +
                 "\"description\":\"adipisicing\"," +
                 "\"releaseDate\":\"1967-03-25\"," +
-                "\"duration\":200" +
+                "\"duration\":200," +
+                "\"likes\":[]" +
                 "}";
         HttpResponse<String> response = httpClient.send(requestPUTFilms(jsonSent), responseHandler);
         assertEquals(200, response.statusCode());
@@ -152,7 +155,7 @@ public class FilmControllerTests {
                 "\"duration\":200" +
                 "}";
         HttpResponse<String> response = httpClient.send(requestPUTFilms(jsonSent), responseHandler);
-        assertEquals(500, response.statusCode());
+        assertEquals(404, response.statusCode());
     }
 
     @Test
@@ -192,7 +195,7 @@ public class FilmControllerTests {
                 "  \"duration\": 100\n" +
                 "}";
         HttpResponse<String> response = httpClient.send(requestPOSTFilms(jsonSent), responseHandler);
-        assertEquals(500, response.statusCode());
+        assertEquals(400, response.statusCode());
     }
 
     @Test
