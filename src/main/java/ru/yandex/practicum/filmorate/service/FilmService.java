@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -19,9 +21,13 @@ import static ru.yandex.practicum.filmorate.storage.Constants.DESCENDING_ORDER;
 public class FilmService {
 
     private final FilmStorage filmStorage;
+
+    private final UserService userService;
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
+                       UserService userService) {
         this.filmStorage = filmStorage;
+        this.userService = userService;
     }
 
     public Film addFilm(Film film) {
@@ -34,10 +40,6 @@ public class FilmService {
 
     public List<Film> getFilms() {
         return filmStorage.getFilms();
-    }
-
-    public Film getFilmById(Integer filmId) {
-        return filmStorage.getFilm(filmId);
     }
 
     public List<Film> getPopularFilms(int count, String sortingOrder) {
@@ -67,5 +69,25 @@ public class FilmService {
             result = -1 * result; //сортировка по убыванию
         }
         return result;
+    }
+
+    public Film addLike(int filmId, int userId) {
+        try {
+            filmStorage.getFilm(filmId);
+            userService.getUser(userId);
+        } catch (UserNotFoundException | FilmNotFoundException e) {
+           throw e;
+        }
+        return filmStorage.addLike(filmId, userId);
+    }
+
+    public Film removeLike(int filmId, int userId) {
+        try {
+            filmStorage.getFilm(filmId);
+            userService.getUser(userId);
+        } catch (UserNotFoundException | FilmNotFoundException e) {
+            throw e;
+        }
+        return filmStorage.removeLike(filmId, userId);
     }
 }

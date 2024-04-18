@@ -72,6 +72,16 @@ public class InMemoryFilmStorage implements FilmStorage {
         return null;
     }
 
+    @Override
+    public Film addLike(int filmId, int userId) {
+        return null;
+    }
+
+    @Override
+    public Film removeLike(int filmId, int userId) {
+        return null;
+    }
+
     private void checkFilmReleaseDate(LocalDate date) {
         if (date.isBefore(EARLIEST_FILM_RELEASE_DATE)) {
             log.warn("Дата создания фильма ожидалась от 1895-12-28, получено: " + date);

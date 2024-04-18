@@ -5,13 +5,13 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Genre {
+public class Mpa {
     @EqualsAndHashCode.Include
     private int id;
     private String name;
 
-    public Genre(int id, String name) {
+    public Mpa(int id, String ratingTitle) {
         this.id = id;
-        this.name = name;
+        this.name = ratingTitle;
     }
 }

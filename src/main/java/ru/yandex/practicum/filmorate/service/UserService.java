@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -37,6 +39,12 @@ public class UserService {
     }
 
     public User addFriend(int userId, int friendId) {
+        try {
+            userStorage.getUser(userId);
+            userStorage.getUser(friendId);
+        } catch (UserNotFoundException e) {
+            throw e;
+        }
         return userStorage.addFriend(userId, friendId);
     }
 
@@ -49,6 +57,15 @@ public class UserService {
         return userStorage.getUsers().stream()
                 .filter(user -> getUser(userId).getFriends().contains(user.getId()))
                 .collect(Collectors.toList());
+    }
+
+    public void approveFriend(int requestFrom, int requestTo) {
+        User user = userStorage.getUser(requestFrom);
+        if (user.getFriends().contains(requestTo)) {
+            userStorage.approveFriend(requestFrom, requestTo);
+        } else {
+            throw new UserNotFoundException("Id не был найден в списке друзей");
+        }
     }
 
     public User getUser(int userId) {
@@ -64,9 +81,5 @@ public class UserService {
         return userStorage.getUsers().stream()
                 .filter(user -> commonUserIds.contains(user.getId()))
                 .collect(Collectors.toList());
-    }
-
-    public addLike(int filmId, int userId) {
-
     }
 }

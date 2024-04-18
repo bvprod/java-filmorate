@@ -16,4 +16,6 @@ public interface UserStorage {
     User addFriend(int userId, int friendId);
 
     User removeFriend(int userId, int friendId);
+
+    void approveFriend(int requestFrom, int requestTo);
 }

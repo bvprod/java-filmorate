@@ -73,15 +73,14 @@ public class UserDbStorage implements UserStorage {
     public List<User> getUsers() {
         String sqlSelectUser = "select * from \"users\"";
         //TODO нужно ли обрабатывать dataAccessException
-        List<User> users = jdbcTemplate.query(sqlSelectUser, this::mapUser);
-        return users;
+        return jdbcTemplate.query(sqlSelectUser, this::mapUser);
     }
 
     @Override
     public User getUser(int userId) {
         String sqlSelectUser = "select * from \"users\" where \"id\" = ?";
         //TODO нужно ли обрабатывать dataAccessException
-        User user = jdbcTemplate.queryForObject(sqlSelectUser, this::mapUser);
+        User user = jdbcTemplate.queryForObject(sqlSelectUser, this::mapUser, userId);
         if (user == null) {
             throw new UserNotFoundException("Пользователь с таким id не найден");
         }
@@ -90,11 +89,12 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User addFriend(int userId, int friendId) {
-        String sqlAddFriend = "INSERT INTO \"friends\" (\"user_id\", \"friend_id\", \"request_status\", \"created_at\")" +
-                " VALUES (?, ?, ?, ?);";
-        int rowsInserted = jdbcTemplate.update(sqlAddFriend,
-                userId, friendId, false, Timestamp.from(Instant.now()));
-        if (rowsInserted == 0) {
+        String sqlInsertFriend = "INSERT INTO \"friends\" (\"user_id\", \"friend_id\", \"request_status\", \"created_at\")" +
+                " VALUES (?, ?, false, CURRENT_TIMESTAMP());";
+        int rowsInserted = jdbcTemplate.update(sqlInsertFriend,
+                userId, friendId);
+
+        if (rowsInserted != 1) {
             throw new RuntimeException("Что-то пошло не так при добавлении в друзья");
         }
         return getUser(userId);
@@ -102,7 +102,23 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User removeFriend(int userId, int friendId) {
-        return null;
+        String sqlDeleteFriend = "DELETE FROM \"friends\" WHERE \"user_id\" = ? AND \"friend_id\" = ?";
+        int rowsDeleted = jdbcTemplate.update(sqlDeleteFriend,
+                userId, friendId);
+        if (rowsDeleted != 1) {
+            throw new RuntimeException("Что-то пошло не так при удалении из друзей");
+        }
+        return getUser(userId);
+    }
+
+    @Override
+    public void approveFriend(int requestFrom, int requestTo) {
+        String sqlUpdateFriendRequestStatus = "UPDATE \"friends\" SET \"request_status\" = TRUE " +
+                "WHERE \"user_id\" = ? AND \"friend_id\" = ?";
+        int rowUpdated = jdbcTemplate.update(sqlUpdateFriendRequestStatus, requestFrom, requestTo);
+        if (rowUpdated != 1) {
+            throw new RuntimeException("Что-то пошло не так при добавлении в друзья");
+        }
     }
 
     private User mapUser(ResultSet rs, int rowNumber) throws SQLException {
@@ -116,9 +132,10 @@ public class UserDbStorage implements UserStorage {
     }
 
     private Set<Integer> getUserFriends(int userId) {
-        String sqlSelectUserFriends = "select case when \"user_id\" = ? then \"user_id\" else \"friend_id\" end as friends_ids " +
-                "from \"friends\" " +
-                "where (\"user_id\" = ? or \"friend_id\" = ?) and \"request_status\" = true";
+        String sqlSelectUserFriends = "SELECT DISTINCT " +
+                "CASE WHEN \"user_id\" = ? THEN \"friend_id\" ELSE \"user_id\" END AS \"friends_ids\"\n" +
+                "FROM \"friends\" \n" +
+                "WHERE \"user_id\" = ? OR (\"friend_id\" = ? AND \"request_status\" = true)";
         List<Integer> friends_ids = jdbcTemplate.query(sqlSelectUserFriends,
                 (rs, rowNum) -> rs.getInt("friends_ids"), userId, userId, userId);
         return new HashSet<>(friends_ids);

@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import ru.yandex.practicum.filmorate.model.deserializers.GenreDeserializer;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
@@ -18,22 +20,15 @@ public class Film {
     @EqualsAndHashCode.Include
     private int id;
     @NotBlank(message = "Имя не должно быть пустым")
-    private String title;
+    private String name;
     @Size(max = 200, message = "Длина описания не должна превышать 200 символов")
     private String description;
     @PastOrPresent(message = "Дата выхода фильма должна быть датой в прошлом")
     private LocalDate releaseDate;
     @Positive(message = "Длительность фильма должна быть положительным числом")
     private int duration;
-    private List<String> genres;
-    private int rating;
     private Set<Integer> likes = new HashSet<>();
-
-    public void addLike(int userId) {
-        likes.add(userId);
-    }
-
-    public void removeLike(int userId) {
-        likes.remove(userId);
-    }
+    //@JsonDeserialize(using = GenreDeserializer.class)
+    private List<Genre> genres;
+    private Mpa mpa;
 }
