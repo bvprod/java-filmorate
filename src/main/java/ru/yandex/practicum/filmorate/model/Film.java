@@ -26,7 +26,7 @@ public class Film {
     @Positive(message = "Длительность фильма должна быть положительным числом")
     private int duration;
     private List<String> genres;
-    private String rating;
+    private int rating;
     private Set<Integer> likes = new HashSet<>();
 
     public void addLike(int userId) {

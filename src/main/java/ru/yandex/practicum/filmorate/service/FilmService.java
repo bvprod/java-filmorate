@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.List;
@@ -18,13 +19,9 @@ import static ru.yandex.practicum.filmorate.storage.Constants.DESCENDING_ORDER;
 public class FilmService {
 
     private final FilmStorage filmStorage;
-    private final UserService userService;
-
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage
-            , UserService userService) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
-        this.userService = userService;
     }
 
     public Film addFilm(Film film) {
@@ -43,28 +40,20 @@ public class FilmService {
         return filmStorage.getFilm(filmId);
     }
 
-    public Film addLike(int filmId, int userId) {
-        Film film = getFilm(filmId);
-        userService.getUser(userId); //throws error if user not found
-        film.addLike(userId);
-        log.info("Поставлен лайк фильму " + filmId + " от пользователя " + userId);
-        return film;
-    }
-
-    public Film removeLike(int filmId, int userId) {
-        Film film = getFilm(filmId);
-        userService.getUser(userId); //throws error if user not found
-        film.removeLike(userId);
-        log.info("Удален лайк по фильму " + filmId + " от пользователя " + userId);
-        return film;
-    }
-
     public List<Film> getPopularFilms(int count, String sortingOrder) {
         log.info("Запрошен список " + count + " популярных фильмов. Сортировка " + sortingOrder);
         return filmStorage.getFilms().stream()
                 .sorted((f1, f2) -> compareFilmsByPopularity(f1, f2, sortingOrder))
                 .limit(count)
                 .collect(Collectors.toList());
+    }
+
+    public List<Genre> getAllGenres() {
+        return filmStorage.getAllGenres();
+    }
+
+    public Genre getGenre(int genreId) {
+        return filmStorage.getGenre(genreId);
     }
 
     public Film getFilm(int filmId) {

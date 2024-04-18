@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -44,12 +45,12 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public Film addFilmLike(@PathVariable("id") Integer filmId, @PathVariable("userId") Integer userId) {
-        return filmService.addLike(filmId, userId);
+        return userService.addLike(filmId, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public Film removeFilmLike(@PathVariable("id") Integer filmId, @PathVariable("userId") Integer userId) {
-        return filmService.removeLike(filmId, userId);
+        return userService.removeLike(filmId, userId);
     }
 
     @GetMapping("/popular")
@@ -65,4 +66,15 @@ public class FilmController {
         }
         return filmService.getPopularFilms(size, sortingOrder);
     }
+
+    @GetMapping("/genres")
+    public List<Genre> getPopularFilms() {
+        return filmService.getAllGenres();
+    }
+
+    @GetMapping("/genres/{id}")
+    public Genre getGenreById(@PathVariable("id") Integer genreId) {
+        return filmService.getGenre(genreId);
+    }
+
 }

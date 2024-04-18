@@ -36,23 +36,12 @@ public class UserService {
         return userStorage.getUser(userId);
     }
 
-
     public User addFriend(int userId, int friendId) {
-        User user = getUser(userId);
-        User friend = getUser(friendId);
-        user.addFriend(friend);
-        friend.addFriend(user);
-        log.info("Пользователь " + userId + " добавил в друзья пользователя " + friendId);
-        return user;
+        return userStorage.addFriend(userId, friendId);
     }
 
     public User removeFriend(int userId, int friendId) {
-        User user = getUser(userId);
-        User friend = getUser(friendId);
-        user.removeFriend(friend);
-        friend.removeFriend(user);
-        log.info("Пользователь " + userId + " удалил из друзей пользователя " + friendId);
-        return user;
+        return userStorage.removeFriend(userId, friendId);
     }
 
     public List<User> getUserFriends(int userId) {
@@ -75,5 +64,9 @@ public class UserService {
         return userStorage.getUsers().stream()
                 .filter(user -> commonUserIds.contains(user.getId()))
                 .collect(Collectors.toList());
+    }
+
+    public addLike(int filmId, int userId) {
+
     }
 }

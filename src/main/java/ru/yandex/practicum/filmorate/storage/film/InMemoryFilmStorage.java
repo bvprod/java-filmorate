@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
@@ -59,6 +60,16 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new FilmNotFoundException("Фильм с id " + filmId + " не найден");
         }
         return films.get(filmId);
+    }
+
+    @Override
+    public Genre getGenre(int genreId) {
+        return null;
+    }
+
+    @Override
+    public List<Genre> getAllGenres() {
+        return null;
     }
 
     private void checkFilmReleaseDate(LocalDate date) {
