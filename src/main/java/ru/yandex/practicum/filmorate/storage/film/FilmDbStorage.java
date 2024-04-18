@@ -1,18 +1,25 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exception.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.Exception.RatingNotFoundException;
+import ru.yandex.practicum.filmorate.Exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
+import java.security.GeneralSecurityException;
 import java.sql.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component("filmDbStorage")
 public class FilmDbStorage implements FilmStorage {
@@ -29,7 +36,6 @@ public class FilmDbStorage implements FilmStorage {
         String sqlInsertFilm = "INSERT INTO \"films\" (\"title\", \"description\", \"release_date\", \"duration\", \"rating_id\") " +
                 "VALUES(?, ?, ?, ?, ?);";
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        //TODO нужно ли обрабатывать исключение из update?
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sqlInsertFilm, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, film.getName());
@@ -51,7 +57,8 @@ public class FilmDbStorage implements FilmStorage {
 
     private void addFilmGenres(Film film) {
         String sqlInsertFilm = "INSERT INTO \"film_genres\" (\"film_id\", \"genre_id\") VALUES (?, ?)";
-        for (Genre genre: film.getGenres()) {
+        List<Genre> distinctGenres = film.getGenres().stream().distinct().collect(Collectors.toList());
+        for (Genre genre: distinctGenres) {
             jdbcTemplate.update(sqlInsertFilm, film.getId(), genre.getId());
         }
     }
@@ -61,10 +68,10 @@ public class FilmDbStorage implements FilmStorage {
         String sqlUpdateUser = "update \"films\" set \"title\" = ?, " +
                 "\"description\" = ?, " +
                 "\"release_date\" = ?, " +
-                "\"duration\" = ? " +
+                "\"duration\" = ? ," +
                 "\"rating_id\" = ? " +
                 "where \"id\" = ?";
-        int updated = jdbcTemplate.update(sqlUpdateUser,
+        jdbcTemplate.update(sqlUpdateUser,
                 film.getName(),
                 film.getDescription(),
                 film.getReleaseDate(),
@@ -72,17 +79,18 @@ public class FilmDbStorage implements FilmStorage {
                 film.getMpa().getId(),
                 film.getId());
         updateFilmGenres(film);
-        if (updated == 0) {
-            throw new FilmNotFoundException("Фильм с данным id не найден");
-        } else {
-            return film;
-        }
+        return getFilm(film.getId());
     }
 
     private void updateFilmGenres(Film film) {
-        deleteFilmGenres(film.getId());
+        if (film.getGenres().isEmpty()) {
+            return;
+        } else {
+            deleteFilmGenres(film.getId());
+        }
         String sqlInsertFilmGenres = "INSERT INTO \"film_genres\" (\"film_id\", \"genre_id\") VALUES (?, ?)";
-        for (Genre genre: film.getGenres()) {
+        List<Genre> distinctGenres = film.getGenres().stream().distinct().collect(Collectors.toList());
+        for (Genre genre: distinctGenres) {
             jdbcTemplate.update(sqlInsertFilmGenres, film.getId(), genre.getId());
         }
     }
@@ -94,7 +102,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getFilms() {
-        String sqlSelectUser = "select * from \"users\"";
+        String sqlSelectUser = "select * from \"films\"";
         //TODO нужно ли обрабатывать dataAccessException
         return jdbcTemplate.query(sqlSelectUser, this::mapFilm);
     }
@@ -103,11 +111,11 @@ public class FilmDbStorage implements FilmStorage {
     public Film getFilm(int filmId) {
         String sqlSelectUser = "select * from \"films\" where \"id\" = ?";
         //TODO нужно ли обрабатывать dataAccessException
-        Film film = jdbcTemplate.queryForObject(sqlSelectUser, this::mapFilm, filmId);
-        if (film == null) {
+        try {
+            return jdbcTemplate.queryForObject(sqlSelectUser, this::mapFilm, filmId);
+        } catch (IncorrectResultSizeDataAccessException e) {
             throw new FilmNotFoundException("Фильм с таким id не найден");
         }
-        return film;
     }
 
     public void deleteFilm(int filmId) {
@@ -120,24 +128,32 @@ public class FilmDbStorage implements FilmStorage {
     public Genre getGenre(int genreId) {
         String sqlSelectGenreById = "SELECT * FROM \"genres\" g \n" +
                 "WHERE g.\"id\" = ?";
-        Genre genre = jdbcTemplate.queryForObject(sqlSelectGenreById,
-                (rs, rowNum) -> new Genre(rs.getInt("id"), rs.getString("name")));
-        if (genre == null) {
-            //TODO изменить вид исключения
-            throw new FilmNotFoundException("Жанр с таким id не найден");
+        try {
+            return jdbcTemplate.queryForObject(sqlSelectGenreById,
+                    (rs, rowNum) -> new Genre(rs.getInt("id"), rs.getString("name")), genreId);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            throw new GenreNotFoundException("Жанр с таким id не найден");
         }
-        return genre;
     }
 
     public Mpa getRating(int ratingId) {
+        //TODO Убрать звездочку и прописать явно поля
         String sqlSelectRatingById = "SELECT * FROM \"ratings\" WHERE \"id\" = ?";
-        Mpa mpa = jdbcTemplate.queryForObject(sqlSelectRatingById,
-                (rs, rowNum) -> new Mpa(rs.getInt("id"), rs.getString("rating_title")), ratingId);
-        if (mpa == null) {
-            //TODO изменить вид исключения
-            throw new FilmNotFoundException("Рейтинг с таким id не найден");
+        try {
+            return jdbcTemplate.queryForObject(sqlSelectRatingById,
+                    (rs, rowNum) -> new Mpa(rs.getInt("id"), rs.getString("rating_title")),
+                    ratingId);
+        } catch (IncorrectResultSizeDataAccessException e) {
+            throw new RatingNotFoundException("Рейтинг с таким id не найден");
         }
-        return mpa;
+    }
+
+    @Override
+    public List<Mpa> getAllRatings() {
+        String sqlSelectUser = "select * from \"ratings\"";
+        //TODO нужно ли обрабатывать dataAccessException
+        return jdbcTemplate.query(sqlSelectUser,
+                (rs, rowNum) -> new Mpa(rs.getInt("id"), rs.getString("rating_title")));
     }
 
     @Override

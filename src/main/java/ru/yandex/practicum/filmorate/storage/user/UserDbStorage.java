@@ -2,18 +2,18 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.Exception.FriendNotFoundException;
 import ru.yandex.practicum.filmorate.Exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.*;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Component("userDbStorage")
@@ -79,21 +79,18 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User getUser(int userId) {
         String sqlSelectUser = "select * from \"users\" where \"id\" = ?";
-        //TODO нужно ли обрабатывать dataAccessException
-        User user = jdbcTemplate.queryForObject(sqlSelectUser, this::mapUser, userId);
-        if (user == null) {
+        try {
+            return jdbcTemplate.queryForObject(sqlSelectUser, this::mapUser, userId);
+        } catch (IncorrectResultSizeDataAccessException e) {
             throw new UserNotFoundException("Пользователь с таким id не найден");
         }
-        return user;
     }
 
     @Override
     public User addFriend(int userId, int friendId) {
         String sqlInsertFriend = "INSERT INTO \"friends\" (\"user_id\", \"friend_id\", \"request_status\", \"created_at\")" +
                 " VALUES (?, ?, false, CURRENT_TIMESTAMP());";
-        int rowsInserted = jdbcTemplate.update(sqlInsertFriend,
-                userId, friendId);
-
+        int rowsInserted = jdbcTemplate.update(sqlInsertFriend, userId, friendId);
         if (rowsInserted != 1) {
             throw new RuntimeException("Что-то пошло не так при добавлении в друзья");
         }
@@ -103,11 +100,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User removeFriend(int userId, int friendId) {
         String sqlDeleteFriend = "DELETE FROM \"friends\" WHERE \"user_id\" = ? AND \"friend_id\" = ?";
-        int rowsDeleted = jdbcTemplate.update(sqlDeleteFriend,
-                userId, friendId);
-        if (rowsDeleted != 1) {
-            throw new RuntimeException("Что-то пошло не так при удалении из друзей");
-        }
+        jdbcTemplate.update(sqlDeleteFriend, userId, friendId);
         return getUser(userId);
     }
 

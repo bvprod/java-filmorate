@@ -3,12 +3,12 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.Exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.List;
@@ -35,6 +35,11 @@ public class FilmService {
     }
 
     public Film updateFilm(Film film) {
+        try {
+            filmStorage.getFilm(film.getId());
+        } catch (FilmNotFoundException e) {
+            throw e;
+        }
         return filmStorage.updateFilm(film);
     }
 
@@ -89,5 +94,13 @@ public class FilmService {
             throw e;
         }
         return filmStorage.removeLike(filmId, userId);
+    }
+
+    public Mpa getRating(int ratingId) {
+        return filmStorage.getRating(ratingId);
+    }
+
+    public List<Mpa> getAllRatings() {
+        return filmStorage.getAllRatings();
     }
 }

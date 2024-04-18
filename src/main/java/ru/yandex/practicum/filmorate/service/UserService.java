@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.Exception.FriendNotFoundException;
 import ru.yandex.practicum.filmorate.Exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -49,6 +49,15 @@ public class UserService {
     }
 
     public User removeFriend(int userId, int friendId) {
+        try {
+            User user = userStorage.getUser(userId);
+            User friend = userStorage.getUser(friendId);
+            if (!getUserFriends(userId).contains(friend)) {
+                throw new FriendNotFoundException("Друг с таким id не найден");
+            }
+        } catch (UserNotFoundException e) {
+            throw e;
+        }
         return userStorage.removeFriend(userId, friendId);
     }
 

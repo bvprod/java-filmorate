@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
@@ -79,6 +80,16 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film removeLike(int filmId, int userId) {
+        return null;
+    }
+
+    @Override
+    public Mpa getRating(int ratingId) {
+        return null;
+    }
+
+    @Override
+    public List<Mpa> getAllRatings() {
         return null;
     }
 
