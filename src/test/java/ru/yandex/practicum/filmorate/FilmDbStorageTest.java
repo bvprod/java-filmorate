@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
@@ -32,13 +31,14 @@ import static ru.yandex.practicum.filmorate.storage.DbConstants.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FilmDbStorageTest {
     private static int filmKeyCounter = 0;
-    private static int userKeyCounter = 0;
     private final JdbcTemplate jdbcTemplate;
     private FilmDbStorage filmStorage;
+    private UserDbStorage userStorage;
 
     @BeforeEach
     public void initUserStorage() {
         filmStorage = new FilmDbStorage(jdbcTemplate);
+        userStorage = new UserDbStorage(jdbcTemplate);
     }
 
     @Test
@@ -142,9 +142,7 @@ public class FilmDbStorageTest {
         film.setId(++filmKeyCounter);
         filmStorage.addFilm(film);
         User user = UserDbStorageTest.createNewTestUser();
-        UserService userService = new UserService(new UserDbStorage(jdbcTemplate));
-        userService.addUser(user);
-        user.setId(++userKeyCounter);
+        user = userStorage.addUser(user);
         Film updated = filmStorage.addLike(film.getId(), user.getId());
         assertThat(updated).isNotNull();
         Assertions.assertEquals(updated.getLikes(), Set.of(user.getId()));
@@ -157,9 +155,7 @@ public class FilmDbStorageTest {
         film.setId(++filmKeyCounter);
         filmStorage.addFilm(film);
         User user = UserDbStorageTest.createNewTestUser();
-        UserService userService = new UserService(new UserDbStorage(jdbcTemplate));
-        userService.addUser(user);
-        user.setId(++userKeyCounter);
+        user = userStorage.addUser(user);
         filmStorage.addLike(film.getId(), user.getId());
         Film updated = filmStorage.removeLike(film.getId(), user.getId());
         assertThat(updated).isNotNull();
