@@ -100,8 +100,8 @@ public class UserDbStorage implements UserStorage {
     }
 
     private Set<Integer> getUserFriends(int userId) {
-        List<Integer> friends_ids = jdbcTemplate.query(SQL_SELECT_USER_FRIENDS,
+        List<Integer> friendsIds = jdbcTemplate.query(SQL_SELECT_USER_FRIENDS,
                 (rs, rowNum) -> rs.getInt("friends_ids"), userId, userId, userId);
-        return new HashSet<>(friends_ids);
+        return new HashSet<>(friendsIds);
     }
 }
