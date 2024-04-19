@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.Exception.*;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
 import javax.validation.ValidationException;
-import java.sql.SQLIntegrityConstraintViolationException;
 
 @RestControllerAdvice
 @Slf4j
@@ -22,7 +21,9 @@ public class ErrorHandler {
     public ErrorResponse handleIncorrectParameterException(final IncorrectParameterException e) {
         log.debug(String.format("Некорректное значение параметра \"%s\": %s", e.getParameter(), e.getMessage()));
         return new ErrorResponse(
-                String.format(String.format("Некорректное значение параметра \"%s\": %s", e.getParameter(), e.getMessage()))
+                String.format(String.format("Некорректное значение параметра \"%s\": %s",
+                        e.getParameter(),
+                        e.getMessage()))
         );
     }
 

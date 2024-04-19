@@ -23,63 +23,57 @@ public class UserService {
     }
 
     public User addUser(User user) {
+        log.info("Запрос на добавление пользователя " + user.getLogin());
         return userStorage.addUser(user);
     }
 
     public User updateUser(User user) {
+        log.info("Запрос на обновление пользователя " + user.getLogin());
         return userStorage.updateUser(user);
     }
 
     public List<User> getUsers() {
+        log.info("Запрос на получение списка всех пользователей");
         return userStorage.getUsers();
     }
 
-    public User getUserById(int userId) {
+    public User getUser(int userId) {
+        log.info("Запрошен пользователь с id = " + userId);
         return userStorage.getUser(userId);
     }
 
     public User addFriend(int userId, int friendId) {
-        try {
-            userStorage.getUser(userId);
-            userStorage.getUser(friendId);
-        } catch (UserNotFoundException e) {
-            throw e;
-        }
+        log.info("Запрос на добавление в друзья от " + userId + " к " + friendId);
+        userStorage.getUser(userId);
+        userStorage.getUser(friendId);
         return userStorage.addFriend(userId, friendId);
     }
 
     public User removeFriend(int userId, int friendId) {
-        try {
-            User user = userStorage.getUser(userId);
-            User friend = userStorage.getUser(friendId);
-            if (!getUserFriends(userId).contains(friend)) {
-                throw new FriendNotFoundException("Друг с таким id не найден");
-            }
-        } catch (UserNotFoundException e) {
-            throw e;
+        log.info("Запрос на удаление из друзей от " + userId + " в отношении " + friendId);
+        userStorage.getUser(userId);
+        User friend = userStorage.getUser(friendId);
+        if (!getUserFriends(userId).contains(friend)) {
+            throw new FriendNotFoundException("Друг с таким id не найден");
         }
         return userStorage.removeFriend(userId, friendId);
     }
 
     public List<User> getUserFriends(int userId) {
-        log.info("Запрошен список друзей пользователя " + userId);
+        log.info("Запрошен список друзей пользователя с id = " + userId);
         return userStorage.getUsers().stream()
                 .filter(user -> getUser(userId).getFriends().contains(user.getId()))
                 .collect(Collectors.toList());
     }
 
     public void approveFriend(int requestFrom, int requestTo) {
+        log.info("Запрос на одобрение запроса о дружбе от " + requestFrom + " к " + requestTo);
         User user = userStorage.getUser(requestFrom);
         if (user.getFriends().contains(requestTo)) {
             userStorage.approveFriend(requestFrom, requestTo);
         } else {
             throw new UserNotFoundException("Id не был найден в списке друзей");
         }
-    }
-
-    public User getUser(int userId) {
-        log.info("Запрошен пользователь " + userId);
-        return userStorage.getUser(userId);
     }
 
     public List<User> getCommonFriends(int user1, int user2) {

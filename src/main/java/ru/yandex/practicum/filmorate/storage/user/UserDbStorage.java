@@ -1,13 +1,10 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.Exception.FriendNotFoundException;
 import ru.yandex.practicum.filmorate.Exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -16,10 +13,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Component("userDbStorage")
-@Slf4j
-public class UserDbStorage implements UserStorage {
+import static ru.yandex.practicum.filmorate.storage.DbConstants.*;
 
+@Component("userDbStorage")
+public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
@@ -28,12 +25,9 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User addUser(User user) {
-        String sqlInsertUser = "INSERT INTO \"users\" (\"email\", \"login\", \"name\", \"birthday\") " +
-                "VALUES(?, ?, ?, ?);";
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        //TODO нужно ли обрабатывать исключение из update?
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sqlInsertUser, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(SQL_INSERT_USER, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getLogin());
             ps.setString(3, user.getName());
@@ -41,7 +35,6 @@ public class UserDbStorage implements UserStorage {
             return ps;
         }, keyHolder);
         if (keyHolder.getKey() == null) {
-            //TODO выбросить нормальное исключение / подумать нужно ли вообще обрабатывать этот случай
             throw new RuntimeException("Что-то пошло не так при получении ключа созданной записи");
         } else {
             user.setId((Integer) keyHolder.getKey());
@@ -51,12 +44,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        String sqlUpdateUser = "update \"users\" set \"email\" = ?," +
-                "\"login\" = ?," +
-                "\"name\" = ?," +
-                "\"birthday\" = ?" +
-                "where \"id\" = ?";
-        int updated = jdbcTemplate.update(sqlUpdateUser,
+        int updated = jdbcTemplate.update(SQL_UPDATE_USER,
                 user.getEmail(),
                 user.getLogin(),
                 user.getName(),
@@ -71,16 +59,13 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getUsers() {
-        String sqlSelectUser = "select * from \"users\"";
-        //TODO нужно ли обрабатывать dataAccessException
-        return jdbcTemplate.query(sqlSelectUser, this::mapUser);
+        return jdbcTemplate.query(SQL_SELECT_ALL_USERS, this::mapUser);
     }
 
     @Override
     public User getUser(int userId) {
-        String sqlSelectUser = "select * from \"users\" where \"id\" = ?";
         try {
-            return jdbcTemplate.queryForObject(sqlSelectUser, this::mapUser, userId);
+            return jdbcTemplate.queryForObject(SQL_SELECT_USER_BY_ID, this::mapUser, userId);
         } catch (IncorrectResultSizeDataAccessException e) {
             throw new UserNotFoundException("Пользователь с таким id не найден");
         }
@@ -88,30 +73,19 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User addFriend(int userId, int friendId) {
-        String sqlInsertFriend = "INSERT INTO \"friends\" (\"user_id\", \"friend_id\", \"request_status\", \"created_at\")" +
-                " VALUES (?, ?, false, CURRENT_TIMESTAMP());";
-        int rowsInserted = jdbcTemplate.update(sqlInsertFriend, userId, friendId);
-        if (rowsInserted != 1) {
-            throw new RuntimeException("Что-то пошло не так при добавлении в друзья");
-        }
+        jdbcTemplate.update(SQL_INSERT_FRIEND, userId, friendId);
         return getUser(userId);
     }
 
     @Override
     public User removeFriend(int userId, int friendId) {
-        String sqlDeleteFriend = "DELETE FROM \"friends\" WHERE \"user_id\" = ? AND \"friend_id\" = ?";
-        jdbcTemplate.update(sqlDeleteFriend, userId, friendId);
+        jdbcTemplate.update(SQL_DELETE_FRIEND, userId, friendId);
         return getUser(userId);
     }
 
     @Override
     public void approveFriend(int requestFrom, int requestTo) {
-        String sqlUpdateFriendRequestStatus = "UPDATE \"friends\" SET \"request_status\" = TRUE " +
-                "WHERE \"user_id\" = ? AND \"friend_id\" = ?";
-        int rowUpdated = jdbcTemplate.update(sqlUpdateFriendRequestStatus, requestFrom, requestTo);
-        if (rowUpdated != 1) {
-            throw new RuntimeException("Что-то пошло не так при добавлении в друзья");
-        }
+        jdbcTemplate.update(SQL_APPROVE_FRIEND, requestFrom, requestTo);
     }
 
     private User mapUser(ResultSet rs, int rowNumber) throws SQLException {
@@ -119,17 +93,14 @@ public class UserDbStorage implements UserStorage {
         user.setId(rs.getInt("id"));
         user.setLogin(rs.getString("login"));
         user.setEmail(rs.getString("email"));
+        user.setName(rs.getString("name"));
         user.setBirthday(rs.getDate("birthday").toLocalDate());
         user.setFriends(getUserFriends(user.getId()));
         return user;
     }
 
     private Set<Integer> getUserFriends(int userId) {
-        String sqlSelectUserFriends = "SELECT DISTINCT " +
-                "CASE WHEN \"user_id\" = ? THEN \"friend_id\" ELSE \"user_id\" END AS \"friends_ids\"\n" +
-                "FROM \"friends\" \n" +
-                "WHERE \"user_id\" = ? OR (\"friend_id\" = ? AND \"request_status\" = true)";
-        List<Integer> friends_ids = jdbcTemplate.query(sqlSelectUserFriends,
+        List<Integer> friends_ids = jdbcTemplate.query(SQL_SELECT_USER_FRIENDS,
                 (rs, rowNum) -> rs.getInt("friends_ids"), userId, userId, userId);
         return new HashSet<>(friends_ids);
     }

@@ -26,4 +26,6 @@ public interface FilmStorage {
     Mpa getRating(int ratingId);
 
     List<Mpa> getAllRatings();
+
+    void deleteFilm(int filmId);
 }

@@ -23,6 +23,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
 
     private final UserService userService;
+
     @Autowired
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
                        UserService userService) {
@@ -31,62 +32,49 @@ public class FilmService {
     }
 
     public Film addFilm(Film film) {
+        log.info("Запрос на добавление фильма " + film.getName());
         return filmStorage.addFilm(film);
     }
 
     public Film updateFilm(Film film) {
-        try {
-            filmStorage.getFilm(film.getId());
-        } catch (FilmNotFoundException e) {
-            throw e;
-        }
+        log.info("Запрос на обновление фильма " + film.getName());
+        filmStorage.getFilm(film.getId());
         return filmStorage.updateFilm(film);
     }
 
     public List<Film> getFilms() {
+        log.info("Запрос на получение списка всех фильмов");
         return filmStorage.getFilms();
     }
 
-    public List<Film> getPopularFilms(int count, String sortingOrder) {
-        log.info("Запрошен список " + count + " популярных фильмов. Сортировка " + sortingOrder);
-        return filmStorage.getFilms().stream()
-                .sorted((f1, f2) -> compareFilmsByPopularity(f1, f2, sortingOrder))
-                .limit(count)
-                .collect(Collectors.toList());
-    }
-
     public List<Genre> getAllGenres() {
+        log.info("Запрос на получение списка всех жанров");
         return filmStorage.getAllGenres();
     }
 
     public Genre getGenre(int genreId) {
+        log.info("Запрос на получение жанра с id = " + genreId);
         return filmStorage.getGenre(genreId);
     }
 
     public Film getFilm(int filmId) {
-        log.info("Запрошен фильм " + filmId);
+        log.info("Запрошен фильм с id = " + filmId);
         return filmStorage.getFilm(filmId);
     }
 
-    private int compareFilmsByPopularity(Film film1, Film film2, String sort) {
-        int result = film1.getLikes().size() - film2.getLikes().size(); //сортировка по возрастанию
-        if (sort.equals(DESCENDING_ORDER)) {
-            result = -1 * result; //сортировка по убыванию
-        }
-        return result;
-    }
-
     public Film addLike(int filmId, int userId) {
+        log.info("Запрос на лайк фильму " + filmId + " от " + userId);
         try {
             filmStorage.getFilm(filmId);
             userService.getUser(userId);
         } catch (UserNotFoundException | FilmNotFoundException e) {
-           throw e;
+            throw e;
         }
         return filmStorage.addLike(filmId, userId);
     }
 
     public Film removeLike(int filmId, int userId) {
+        log.info("Запрос на удаление лайка фильму " + filmId + " от " + userId);
         try {
             filmStorage.getFilm(filmId);
             userService.getUser(userId);
@@ -97,10 +85,28 @@ public class FilmService {
     }
 
     public Mpa getRating(int ratingId) {
+        log.info("Запрос на получение рейтинга под id = " + ratingId);
         return filmStorage.getRating(ratingId);
     }
 
     public List<Mpa> getAllRatings() {
+        log.info("Запрос на получение списка рейтингов");
         return filmStorage.getAllRatings();
+    }
+
+    public List<Film> getPopularFilms(int count, String sortingOrder) {
+        log.info("Запрошен список " + count + " популярных фильмов. Сортировка " + sortingOrder);
+        return filmStorage.getFilms().stream()
+                .sorted((f1, f2) -> compareFilmsByPopularity(f1, f2, sortingOrder))
+                .limit(count)
+                .collect(Collectors.toList());
+    }
+
+    private int compareFilmsByPopularity(Film film1, Film film2, String sort) {
+        int result = film1.getLikes().size() - film2.getLikes().size(); //сортировка по возрастанию
+        if (sort.equals(DESCENDING_ORDER)) {
+            result = -1 * result; //сортировка по убыванию
+        }
+        return result;
     }
 }
