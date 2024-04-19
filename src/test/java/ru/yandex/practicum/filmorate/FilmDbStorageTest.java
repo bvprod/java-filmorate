@@ -3,9 +3,11 @@ package ru.yandex.practicum.filmorate;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
 import ru.yandex.practicum.filmorate.Exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.Exception.RatingNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -29,8 +31,8 @@ import static ru.yandex.practicum.filmorate.storage.DbConstants.*;
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class FilmDbStorageTest {
-    private static int filmKeyCounter = 0;
     private final JdbcTemplate jdbcTemplate;
     private FilmDbStorage filmStorage;
     private UserDbStorage userStorage;
@@ -50,14 +52,11 @@ public class FilmDbStorageTest {
     @Test
     @Order(2)
     public void testShouldAddNewFilm() {
-        Film film = createNewTestFilm();
-        int filmKey = ++filmKeyCounter;
-        film.setId(filmKey);
-        filmStorage.addFilm(film);
+        Film film = filmStorage.addFilm(createNewTestFilm());
 
         Film savedFilm = jdbcTemplate.queryForObject(SQL_SELECT_FILM_BY_ID,
                 this::mapFilm,
-                filmKey);
+                film.getId());
 
         assertThat(savedFilm)
                 .isNotNull()
@@ -68,12 +67,9 @@ public class FilmDbStorageTest {
     @Test
     @Order(3)
     public void testGetFilmShouldReturnFilmByCorrectId() {
-        Film film = createNewTestFilm();
-        int filmKey = ++filmKeyCounter;
-        film.setId(filmKey);
-        filmStorage.addFilm(film);
+        Film film = filmStorage.addFilm(createNewTestFilm());
 
-        Film savedFilm = filmStorage.getFilm(filmKey);
+        Film savedFilm = filmStorage.getFilm(film.getId());
 
         assertThat(savedFilm)
                 .isNotNull()
@@ -89,10 +85,7 @@ public class FilmDbStorageTest {
     @Test
     @Order(3)
     public void testShouldCorrectlyUpdateUserById() {
-        Film film = createNewTestFilm();
-        int filmKey = ++filmKeyCounter;
-        film.setId(filmKey);
-        filmStorage.addFilm(film);
+        Film film = filmStorage.addFilm(createNewTestFilm());
         film.setName("Другое имя");
         film.setDescription("otherEmail@mail.ru");
         Film updatedFilm = filmStorage.updateFilm(film);
@@ -106,10 +99,7 @@ public class FilmDbStorageTest {
     @Test
     @Order(4)
     public void testShouldThrowDataIntegrityViolationException() {
-        Film film = createNewTestFilm();
-        int filmKey = ++filmKeyCounter;
-        film.setId(filmKey);
-        filmStorage.addFilm(film);
+        Film film = filmStorage.addFilm(createNewTestFilm());
         film.setName("Другое имя");
         film.setDescription("другой фильм");
         film.setId(1000);
@@ -120,15 +110,9 @@ public class FilmDbStorageTest {
     @Test
     @Order(5)
     public void testShouldReturnAllFilms() {
-        Film film = createNewTestFilm();
-        film.setId(++filmKeyCounter);
-        Film film2 = createNewTestFilm();
-        film2.setId(++filmKeyCounter);
-        Film film3 = createNewTestFilm();
-        film3.setId(++filmKeyCounter);
-        filmStorage.addFilm(film);
-        filmStorage.addFilm(film2);
-        filmStorage.addFilm(film3);
+        Film film = filmStorage.addFilm(createNewTestFilm());
+        Film film2 = filmStorage.addFilm(createNewTestFilm());
+        Film film3 = filmStorage.addFilm(createNewTestFilm());
 
         List<Film> films = filmStorage.getFilms();
 
@@ -138,9 +122,7 @@ public class FilmDbStorageTest {
     @Test
     @Order(6)
     public void testShouldAddLike() {
-        Film film = createNewTestFilm();
-        film.setId(++filmKeyCounter);
-        filmStorage.addFilm(film);
+        Film film = filmStorage.addFilm(createNewTestFilm());
         User user = UserDbStorageTest.createNewTestUser();
         user = userStorage.addUser(user);
         Film updated = filmStorage.addLike(film.getId(), user.getId());
@@ -151,9 +133,7 @@ public class FilmDbStorageTest {
     @Test
     @Order(7)
     public void testShouldRemoveLike() {
-        Film film = createNewTestFilm();
-        film.setId(++filmKeyCounter);
-        filmStorage.addFilm(film);
+        Film film = filmStorage.addFilm(createNewTestFilm());
         User user = UserDbStorageTest.createNewTestUser();
         user = userStorage.addUser(user);
         filmStorage.addLike(film.getId(), user.getId());
