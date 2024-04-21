@@ -46,13 +46,11 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Order(1)
     public void testGetUsersShouldReturnEmptyList() {
         assertThat(userStorage.getUsers()).isNotNull().isEmpty();
     }
 
     @Test
-    @Order(2)
     public void testShouldAddNewUser() {
         User newUser = userStorage.addUser(createNewTestUser());
 
@@ -67,7 +65,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Order(3)
     public void testGetUserShouldReturnUserByCorrectId() {
         User newUser = userStorage.addUser(createNewTestUser());
 
@@ -85,7 +82,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Order(3)
     public void testShouldCorrectlyUpdateUserById() {
         User user = userStorage.addUser(createNewTestUser());
         user.setName("Другое имя");
@@ -99,7 +95,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Order(4)
     public void testShouldThrowUserNotFoundExceptionWhenUpdatingUserWithInvalidId() {
         User user = userStorage.addUser(createNewTestUser());
         user.setName("Другое имя");
@@ -109,7 +104,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Order(5)
     public void testShouldReturnAllUsers() {
         User user1 = userStorage.addUser(createNewTestUser());
         User user2 = userStorage.addUser(createNewTestUser());
@@ -121,7 +115,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Order(6)
     public void testShouldAddFriend() {
         User user1 = userStorage.addUser(createNewTestUser());
         User user2 = userStorage.addUser(createNewTestUser());
@@ -137,7 +130,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Order(7)
     public void testShouldThrowDataIntegrityViolationExceptionWhenAddingFriendWithInvalidId() {
         User user1 = userStorage.addUser(createNewTestUser());
 
@@ -148,7 +140,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Order(8)
     public void testShouldRemoveFriend() {
         User user1 = userStorage.addUser(createNewTestUser());
         User user2 = userStorage.addUser(createNewTestUser());
@@ -164,7 +155,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Order(9)
     public void testShouldApproveFriend() {
         User user1 = userStorage.addUser(createNewTestUser());
         User user2 = userStorage.addUser(createNewTestUser());
