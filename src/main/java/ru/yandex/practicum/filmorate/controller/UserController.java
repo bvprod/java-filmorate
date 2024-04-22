@@ -7,7 +7,9 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -49,13 +51,13 @@ public class UserController {
     }
 
     @PatchMapping("/{requestFromId}/friends/{requestToId}")
-    public String approveFriend(@PathVariable("requestFromId") Integer requestFrom,
-                                @PathVariable("requestToId") Integer requestTo) {
+    public Map<String, String> approveFriend(@PathVariable("requestFromId") Integer requestFrom,
+                                             @PathVariable("requestToId") Integer requestTo) {
         if (requestFrom.equals(requestTo)) {
             throw new IncorrectParameterException("Идентификаторы не могут быть одинаковые");
         }
         userService.approveFriend(requestFrom, requestTo);
-        return "Friendship approved!";
+        return Map.of("status", "Friendship approved!");
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
