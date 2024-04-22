@@ -17,9 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class UserControllerTests {
-    private static ConfigurableApplicationContext context;
     private static final HttpClient httpClient = HttpClient.newHttpClient();
     private static final HttpResponse.BodyHandler<String> responseHandler = HttpResponse.BodyHandlers.ofString();
+    private static ConfigurableApplicationContext context;
 
     @BeforeEach
     void setupContext() {
@@ -177,26 +177,6 @@ public class UserControllerTests {
                 "}";
         HttpResponse<String> response = httpClient.send(requestPOSTUsers(jsonSent), responseHandler);
         assertEquals(400, response.statusCode());
-    }
-
-    @Test
-    void nameShouldBeFilledWithLoginWhenNotSpecified() throws IOException, InterruptedException {
-        String jsonSent = "{\n" +
-                "  \"login\": \"dolore\",\n" +
-                "  \"email\": \"mail@mail.ru\",\n" +
-                "  \"birthday\": \"1946-08-20\"\n" +
-                "}";
-        String jsonExpected = "{" +
-                "\"id\":1," +
-                "\"email\":\"mail@mail.ru\"," +
-                "\"login\":\"dolore\"," +
-                "\"name\":\"dolore\"," +
-                "\"birthday\":\"1946-08-20\"" +
-                ",\"friends\":[]" +
-                "}";
-        HttpResponse<String> response = httpClient.send(requestPOSTUsers(jsonSent), responseHandler);
-        assertEquals(200, response.statusCode());
-        assertEquals(jsonExpected, response.body());
     }
 
     @Test

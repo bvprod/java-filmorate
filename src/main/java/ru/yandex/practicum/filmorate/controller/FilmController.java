@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -13,7 +15,6 @@ import static ru.yandex.practicum.filmorate.storage.Constants.DESCENDING_ORDER;
 import static ru.yandex.practicum.filmorate.storage.Constants.SORTS;
 
 @RestController
-@RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
 
@@ -22,37 +23,37 @@ public class FilmController {
         this.filmService = filmService;
     }
 
-    @PostMapping
+    @PostMapping("/films")
     public Film addFilm(@Valid @RequestBody Film film) {
         return filmService.addFilm(film);
     }
 
-    @PutMapping
+    @PutMapping("/films")
     public Film updateFilm(@Valid @RequestBody Film film) {
         return filmService.updateFilm(film);
     }
 
-    @GetMapping
+    @GetMapping("/films")
     public List<Film> getFilms() {
         return filmService.getFilms();
     }
 
-    @GetMapping("/{filmId}")
+    @GetMapping("/films/{filmId}")
     public Film getFilmById(@PathVariable("filmId") Integer filmId) {
         return filmService.getFilm(filmId);
     }
 
-    @PutMapping("/{id}/like/{userId}")
+    @PutMapping("/films/{id}/like/{userId}")
     public Film addFilmLike(@PathVariable("id") Integer filmId, @PathVariable("userId") Integer userId) {
         return filmService.addLike(filmId, userId);
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
+    @DeleteMapping("/films/{id}/like/{userId}")
     public Film removeFilmLike(@PathVariable("id") Integer filmId, @PathVariable("userId") Integer userId) {
         return filmService.removeLike(filmId, userId);
     }
 
-    @GetMapping("/popular")
+    @GetMapping("/films/popular")
     public List<Film> getPopularFilms(
             @RequestParam(defaultValue = "10", required = false) Integer size,
             @RequestParam(defaultValue = DESCENDING_ORDER, required = false) String sortingOrder
@@ -64,5 +65,25 @@ public class FilmController {
             throw new IncorrectParameterException("page");
         }
         return filmService.getPopularFilms(size, sortingOrder);
+    }
+
+    @GetMapping("/genres")
+    public List<Genre> getPopularFilms() {
+        return filmService.getAllGenres();
+    }
+
+    @GetMapping("/genres/{id}")
+    public Genre getGenreById(@PathVariable("id") Integer genreId) {
+        return filmService.getGenre(genreId);
+    }
+
+    @GetMapping("/mpa/{id}")
+    public Mpa getRatingById(@PathVariable("id") Integer ratingId) {
+        return filmService.getRating(ratingId);
+    }
+
+    @GetMapping("/mpa")
+    public List<Mpa> getAllRatings() {
+        return filmService.getAllRatings();
     }
 }
