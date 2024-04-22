@@ -1,8 +1,5 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class DbConstants {
     public static final String SQL_INSERT_FILM = "INSERT INTO \"films\" "
             + "(\"title\", \"description\", \"release_date\", \"duration\", \"rating_id\") "
@@ -77,8 +74,13 @@ public class DbConstants {
     public static final String SQL_DELETE_FRIEND = "DELETE FROM \"friends\" WHERE \"user_id\" = ? AND \"friend_id\" = ?";
     public static final String SQL_APPROVE_FRIEND = "UPDATE \"friends\" SET \"request_status\" = TRUE " +
             "WHERE \"user_id\" = ? AND \"friend_id\" = ?";
-    public static final String SQL_SELECT_USER_FRIENDS = "SELECT DISTINCT " +
+    public static final String SQL_SELECT_USER_FRIENDS_IDS = "SELECT DISTINCT " +
             "CASE WHEN \"user_id\" = ? THEN \"friend_id\" ELSE \"user_id\" END AS \"friends_ids\"\n" +
             "FROM \"friends\" \n" +
             "WHERE \"user_id\" = ? OR (\"friend_id\" = ? AND \"request_status\" = true)";
+
+    public static final String SQL_SELECT_USER_FRIENDS = "SELECT \"id\", \"email\", \"login\", \"name\", \"birthday\" " +
+            "FROM \"users\" WHERE \"id\" IN (\n" +
+            "SELECT DISTINCT CASE WHEN \"user_id\" = ? THEN \"friend_id\" ELSE \"user_id\" END AS \"friends_ids\"\n" +
+            "FROM \"friends\" WHERE \"user_id\" = ? OR (\"friend_id\" = ? AND \"request_status\" = true))";
 }

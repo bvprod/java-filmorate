@@ -43,13 +43,11 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    @Order(1)
     public void testGetFilmsShouldReturnEmptyList() {
         assertThat(filmStorage.getFilms()).isNotNull().isEmpty();
     }
 
     @Test
-    @Order(2)
     public void testShouldAddNewFilm() {
         Film film = filmStorage.addFilm(createNewTestFilm());
 
@@ -64,7 +62,6 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    @Order(3)
     public void testGetFilmShouldReturnFilmByCorrectId() {
         Film film = filmStorage.addFilm(createNewTestFilm());
 
@@ -82,8 +79,7 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    @Order(3)
-    public void testShouldCorrectlyUpdateUserById() {
+    public void testShouldCorrectlyUpdateFilmById() {
         Film film = filmStorage.addFilm(createNewTestFilm());
         film.setName("Другое имя");
         film.setDescription("otherEmail@mail.ru");
@@ -96,7 +92,6 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    @Order(4)
     public void testShouldThrowDataIntegrityViolationException() {
         Film film = filmStorage.addFilm(createNewTestFilm());
         film.setName("Другое имя");
@@ -107,7 +102,6 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    @Order(5)
     public void testShouldReturnAllFilms() {
         Film film = filmStorage.addFilm(createNewTestFilm());
         Film film2 = filmStorage.addFilm(createNewTestFilm());
@@ -119,7 +113,6 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    @Order(6)
     public void testShouldAddLike() {
         Film film = filmStorage.addFilm(createNewTestFilm());
         User user = UserDbStorageTest.createNewTestUser();
@@ -130,7 +123,6 @@ public class FilmDbStorageTest {
     }
 
     @Test
-    @Order(7)
     public void testShouldRemoveLike() {
         Film film = filmStorage.addFilm(createNewTestFilm());
         User user = UserDbStorageTest.createNewTestUser();

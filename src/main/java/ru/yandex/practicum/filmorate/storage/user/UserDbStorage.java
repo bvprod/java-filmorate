@@ -95,13 +95,19 @@ public class UserDbStorage implements UserStorage {
         user.setEmail(rs.getString("email"));
         user.setName(rs.getString("name"));
         user.setBirthday(rs.getDate("birthday").toLocalDate());
-        user.setFriends(getUserFriends(user.getId()));
+        user.setFriends(getUserFriendsIds(user.getId()));
         return user;
     }
 
-    private Set<Integer> getUserFriends(int userId) {
-        List<Integer> friendsIds = jdbcTemplate.query(SQL_SELECT_USER_FRIENDS,
+    private Set<Integer> getUserFriendsIds(int userId) {
+        List<Integer> friendsIds = jdbcTemplate.query(SQL_SELECT_USER_FRIENDS_IDS,
                 (rs, rowNum) -> rs.getInt("friends_ids"), userId, userId, userId);
         return new HashSet<>(friendsIds);
+    }
+
+    @Override
+    public List<User> getUserFriends(int userId) {
+        return jdbcTemplate.query(SQL_SELECT_USER_FRIENDS,
+                this::mapUser, userId, userId, userId);
     }
 }

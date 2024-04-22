@@ -21,7 +21,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.yandex.practicum.filmorate.storage.DbConstants.SQL_SELECT_USER_BY_ID;
-import static ru.yandex.practicum.filmorate.storage.DbConstants.SQL_SELECT_USER_FRIENDS;
+import static ru.yandex.practicum.filmorate.storage.DbConstants.SQL_SELECT_USER_FRIENDS_IDS;
 
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -182,7 +182,7 @@ class UserDbStorageTest {
     }
 
     private Set<Integer> getUserFriends(int userId) {
-        List<Integer> friendsIds = jdbcTemplate.query(SQL_SELECT_USER_FRIENDS,
+        List<Integer> friendsIds = jdbcTemplate.query(SQL_SELECT_USER_FRIENDS_IDS,
                 (rs, rowNum) -> rs.getInt("friends_ids"), userId, userId, userId);
         return new HashSet<>(friendsIds);
     }

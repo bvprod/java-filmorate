@@ -64,23 +64,15 @@ public class FilmService {
 
     public Film addLike(int filmId, int userId) {
         log.info("Запрос на лайк фильму " + filmId + " от " + userId);
-        try {
-            filmStorage.getFilm(filmId);
-            userService.getUser(userId);
-        } catch (UserNotFoundException | FilmNotFoundException e) {
-            throw e;
-        }
+        filmStorage.getFilm(filmId);
+        userService.getUser(userId);
         return filmStorage.addLike(filmId, userId);
     }
 
     public Film removeLike(int filmId, int userId) {
         log.info("Запрос на удаление лайка фильму " + filmId + " от " + userId);
-        try {
-            filmStorage.getFilm(filmId);
-            userService.getUser(userId);
-        } catch (UserNotFoundException | FilmNotFoundException e) {
-            throw e;
-        }
+        filmStorage.getFilm(filmId);
+        userService.getUser(userId);
         return filmStorage.removeLike(filmId, userId);
     }
 

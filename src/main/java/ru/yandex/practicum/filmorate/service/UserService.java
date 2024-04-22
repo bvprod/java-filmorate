@@ -61,9 +61,8 @@ public class UserService {
 
     public List<User> getUserFriends(int userId) {
         log.info("Запрошен список друзей пользователя с id = " + userId);
-        return userStorage.getUsers().stream()
-                .filter(user -> getUser(userId).getFriends().contains(user.getId()))
-                .collect(Collectors.toList());
+        userStorage.getUser(userId);
+        return userStorage.getUserFriends(userId);
     }
 
     public void approveFriend(int requestFrom, int requestTo) {

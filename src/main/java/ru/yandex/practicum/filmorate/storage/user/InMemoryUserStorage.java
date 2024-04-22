@@ -70,4 +70,8 @@ public class InMemoryUserStorage implements UserStorage {
     public void approveFriend(int userId, int friendId) {
 
     }
+    @Override
+    public List<User> getUserFriends(int userId) {
+        return null;
+    }
 }

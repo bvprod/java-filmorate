@@ -19,7 +19,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleIncorrectParameterException(final IncorrectParameterException e) {
-        log.debug(String.format("Некорректное значение параметра \"%s\": %s", e.getParameter(), e.getMessage()));
+        log.info(String.format("Некорректное значение параметра \"%s\": %s", e.getParameter(), e.getMessage()));
         return new ErrorResponse(
                 String.format(String.format("Некорректное значение параметра \"%s\": %s",
                         e.getParameter(),
@@ -30,7 +30,7 @@ public class ErrorHandler {
     @ExceptionHandler({MethodArgumentNotValidException.class, ValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(final Throwable e) {
-        log.debug(String.format("Ошибка валидации параметра: %s", e.getMessage()));
+        log.info(String.format("Ошибка валидации параметра: %s", e.getMessage()));
         return new ErrorResponse(String.format("Ошибка валидации параметра: %s", e.getMessage()));
     }
 
@@ -38,28 +38,28 @@ public class ErrorHandler {
             GenreNotFoundException.class, RatingNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleUserNotFoundException(final RuntimeException e) {
-        log.debug(String.format("Сущность с данным id не найдена: %s", e.getMessage()));
+        log.info(String.format("Сущность с данным id не найдена: %s", e.getMessage()));
         return new ErrorResponse(String.format("Сущность с данным id не найдена: %s", e.getMessage()));
     }
 
     @ExceptionHandler(FriendNotFoundException.class)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ErrorResponse handleFriendNotFoundException(final RuntimeException e) {
-        log.debug(String.format("При операции со списком друзей возникла ошибка: %s", e.getMessage()));
+        log.info(String.format("При операции со списком друзей возникла ошибка: %s", e.getMessage()));
         return new ErrorResponse(String.format("При операции со списком друзей возникла ошибка: %s", e.getMessage()));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleSQLIntegrityConstraintViolationException(final Throwable e) {
-        log.debug(String.format("Нарушено ограничение уникальности: %s", e.getMessage()));
+        log.info(String.format("Нарушено ограничение уникальности: %s", e.getMessage()));
         return new ErrorResponse(String.format("Нарушено ограничение уникальности: %s", e.getMessage()));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleOtherException(final Throwable e) {
-        log.error(String.format("Произошла непредвиденная ошибка: %s", e.getMessage()));
+        log.info(String.format("Произошла непредвиденная ошибка: %s", e.getMessage()));
         return new ErrorResponse(String.format("Произошла непредвиденная ошибка: %s", e.getMessage()));
     }
 
